@@ -1,0 +1,8 @@
+node_modules/
+.env
+data/products.json
+data/orders.json
+data/*.tmp
+data/site.json
+data/site-history.json
+data/uploads/
