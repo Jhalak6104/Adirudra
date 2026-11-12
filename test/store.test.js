@@ -209,3 +209,48 @@ test('uploads: accepts real images only and serves them', async () => {
   const anon = await fetch(base + '/api/admin/uploads', { method: 'POST', headers: { 'Content-Type': 'image/png' }, body: png });
   assert.equal(anon.status, 401);
 });
+
+test('settings: admin edits fees, contact and coupons; pricing uses them at once', async () => {
+  assert.equal((await call('/api/admin/settings')).status, 401);
+  const cookie = await adminCookie();
+  const original = (await call('/api/admin/settings', { cookie })).body;
+  assert.equal(original.shippingFee, config.shop.shippingFee);
+  assert.ok(original.coupons.some((c) => c.code === 'ADIRUDRA10'));
+
+  const next = {
+    ...original, freeShippingOver: 5000, shippingFee: 150, codFee: 0, maxQtyPerItem: 3, whatsappNumber: '98765 43210', email: 'Shop@Example.com',
+    coupons: [{ code: 'diwali25', type: 'percent', value: 25, min: '', label: '', active: true }, { code: 'PAUSED', type: 'flat', value: 100, min: 0, label: 'Paused', active: false }]
+  };
+  const saved = await call('/api/admin/settings', { method: 'PUT', body: next, cookie });
+  assert.equal(saved.status, 200);
+  assert.equal(saved.body.whatsappNumber, '919876543210');
+  assert.equal(saved.body.email, 'shop@example.com');
+  assert.equal(saved.body.coupons[0].code, 'DIWALI25');
+  assert.equal(saved.body.coupons[0].label, '25% off your order');
+
+  const pub = (await call('/api/config')).body;
+  assert.equal(pub.shippingFee, 150);
+  assert.equal(pub.whatsappNumber, '919876543210');
+  const q = (await call('/api/quote', { method: 'POST', body: { items: [{ id: 'AR-001', qty: 1 }], coupon: 'DIWALI25', payment: 'cod' } })).body;
+  assert.equal(q.shipping, 150);
+  assert.equal(q.codFee, 0);
+  assert.equal(q.discount, Math.round(q.subtotal * 0.25));
+  assert.equal((await call('/api/quote', { method: 'POST', body: { items: [{ id: 'AR-001', qty: 1 }], coupon: 'ADIRUDRA10' } })).body.couponError, 'That code is not valid.');
+  assert.equal((await call('/api/quote', { method: 'POST', body: { items: [{ id: 'AR-001', qty: 1 }], coupon: 'PAUSED' } })).body.couponError, 'That code is not valid.');
+  assert.equal(JSON.parse(await readFile(path.join(dataDir, 'settings.json'), 'utf8')).shippingFee, 150);
+
+  const bad = [
+    [{ shippingFee: -1 }, 'shippingFee'], [{ codFee: 'abc' }, 'codFee'], [{ email: 'not-an-email' }, 'email'], [{ whatsappNumber: '123' }, 'whatsappNumber'],
+    [{ coupons: [{ code: 'X', type: 'percent', value: 10 }] }, 'coupons.0.code'],
+    [{ coupons: [{ code: 'BIG', type: 'percent', value: 95 }] }, 'coupons.0.value'],
+    [{ coupons: [{ code: 'DUP', type: 'flat', value: 5 }, { code: 'dup', type: 'flat', value: 5 }] }, 'coupons.1.code']
+  ];
+  for (const [patch, field] of bad) {
+    const r = await call('/api/admin/settings', { method: 'PUT', body: { ...next, ...patch }, cookie });
+    assert.equal(r.status, 400, field);
+    assert.equal(r.body.field, field);
+  }
+
+  assert.equal((await call('/api/admin/settings', { method: 'PUT', body: original, cookie })).status, 200);
+  assert.equal(config.shop.shippingFee, original.shippingFee);
+});

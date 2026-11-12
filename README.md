@@ -26,6 +26,7 @@ src/
   pricing.js         Cart pricing: discounts, shipping, COD fee (server is the source of truth)
   validate.js        Customer + product validation
   razorpay.js        Razorpay order creation + signature verification
+  settings.js        Store settings edited in the admin (fees, contact, coupons)
   auth.js            Admin password login, signed httpOnly cookie, login rate limit
   db.js              JSON-file storage (data/products.json, data/orders.json)
 data/
@@ -45,6 +46,7 @@ test/                API and pricing tests (node:test)
 
 ### Admin (`/admin`)
 - **Orders:** search, filter by status, totals at a glance, full order details, change status or payment status, and add notes such as tracking numbers. Cancelling an order puts its items back in stock.
+- **Settings:** free-shipping threshold, shipping fee, cash-on-delivery fee, max quantity per product, WhatsApp number, store email, and coupon codes (add, edit, pause or remove; % or ₹ off, optional minimum order). Changes apply to new orders immediately, no restart needed. They're saved in `data/settings.json`; the `.env` values are only the starting defaults.
 - **Products:** add, edit or delete products. Price, stock, featured and visibility can be edited directly in the table. A product that appears in past orders is hidden instead of deleted.
 
 ### Website editor (`/admin` → Website)
@@ -70,19 +72,20 @@ How it works: settings live in `data/site.json` (defaults in `src/site.js`). The
 | POST | `/api/admin/login` / `logout` | Admin session |
 | GET/PATCH | `/api/admin/orders[/:id]` | Manage orders |
 | GET/POST/PATCH/DELETE | `/api/admin/products[/:id]` | Manage products |
+| GET/PUT | `/api/admin/settings` | Store settings (fees, contact, coupons) |
 | GET/PUT | `/api/admin/site` | Website settings |
 | POST | `/api/admin/site/restore`, `/api/admin/site/reset` | Version history |
 | POST | `/api/admin/uploads` | Upload an image (raw body) |
 
 ## Configuration
 
-Everything is set in `.env` (see `.env.example`). The admin password, session secret, Razorpay keys, WhatsApp number, store email and shipping/COD fees all go there. Coupon codes are in `src/config.js`.
+The admin password, session secret and Razorpay keys are set in `.env` (see `.env.example`). The WhatsApp number, store email, shipping/COD fees and coupon codes can be set there and in `src/config.js` as starting defaults, but once you save **Admin → Settings**, the values in `data/settings.json` are used instead.
 
 ## Before going live
 
 - Use **Razorpay live keys** and set `NODE_ENV=production`. Run the site behind HTTPS (for example nginx or Caddy, or a host like Render or Railway).
 - Set a **strong `ADMIN_PASSWORD`** and a fixed `SESSION_SECRET`.
-- **Back up the `data/` folder.** It holds products, orders, website settings and uploaded images.
+- **Back up the `data/` folder.** It holds products, orders, store and website settings, and uploaded images.
   JSON files suit a single server with modest traffic. For more traffic, swap `src/db.js` for SQLite or Postgres; the rest of the code only uses its small interface.
 - Set up a **Razorpay webhook** (`payment.captured`) as a backup to the browser callback.
 - Add **order emails** (for example with Nodemailer or Resend) to notify you and the customer.

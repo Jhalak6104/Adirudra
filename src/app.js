@@ -9,6 +9,7 @@ import { createRazorpayOrder, verifyPaymentSignature } from './razorpay.js';
 import { requireAdmin, isAdmin, login, logout } from './auth.js';
 import { DEFAULTS, HEADING_FONTS, BODY_FONTS, TRUST_ICONS, validateSite, themeCss, fontsUrl } from './site.js';
 import { saveUpload, uploadsDir, MAX_UPLOAD_BYTES } from './uploads.js';
+import { createSettingsStore, validateSettings } from './settings.js';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -43,7 +44,7 @@ function newOrderId() {
 // Wrap async handlers so thrown errors reach the error middleware.
 const route = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next);
 
-export function createApp(db, siteStore) {
+export function createApp(db, siteStore, settingsStore = createSettingsStore(config.dataDir)) {
   const app = express();
   app.disable('x-powered-by');
   app.set('trust proxy', 'loopback');
@@ -238,6 +239,15 @@ export function createApp(db, siteStore) {
       return p ? res.json({ archived: true }) : res.status(404).json({ error: 'Product not found.' });
     }
     (await db.products.remove(req.params.id)) ? res.json({ deleted: true }) : res.status(404).json({ error: 'Product not found.' });
+  }));
+
+  // ---------------- Store settings (fees, contact, coupons) ----------------
+  admin.get('/settings', (req, res) => res.json(settingsStore.get()));
+
+  admin.put('/settings', route(async (req, res) => {
+    const v = validateSettings(req.body);
+    if (v.error) return res.status(400).json({ error: v.error, field: v.field });
+    res.json(await settingsStore.save(v.value));
   }));
 
   // ---------------- Website editor ----------------

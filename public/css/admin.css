@@ -154,3 +154,16 @@ body.is-editing-site .admin-main { max-width: none; width: 100%; margin: 0; padd
   .ed-toolbar { position: sticky; top: var(--header-h); z-index: 5; }
   .ed-stage { height: 80vh; }
 }
+
+/* ---------- Store settings ---------- */
+.settings-actions { display: flex; align-items: center; gap: 14px; }
+.settings-card { background: var(--surface); border: 1px solid var(--line); padding: 24px; margin-bottom: 20px; }
+.settings-card h2 { font-family: var(--serif); font-size: 26px; font-weight: 600; margin: 0 0 16px; }
+.settings-card .admin-head h2 { margin: 0; }
+.settings-card .field small { font-size: 12px; }
+#couponsTable .input { width: 100%; min-width: 80px; }
+#couponsTable .c-code { min-width: 130px; text-transform: uppercase; }
+#couponsTable .c-label { min-width: 200px; }
+#couponsTable td.has-error .input, #couponsTable td.has-error .select { border-color: var(--danger); }
+#couponsTable td .field__error { display: block; margin-top: 4px; white-space: normal; }
+@media (max-width: 860px) { .settings-card { padding: 18px; } .settings-card .form-grid { grid-template-columns: 1fr; } }

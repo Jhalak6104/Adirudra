@@ -39,12 +39,12 @@
   // ---------- Views ----------
   function showLogin() {
     $('#loginView').hidden = false;
-    $('#ordersView').hidden = $('#productsView').hidden = $('#siteView').hidden = $('#tabs').hidden = $('#logoutBtn').hidden = true;
+    $('#ordersView').hidden = $('#productsView').hidden = $('#siteView').hidden = $('#settingsView').hidden = $('#tabs').hidden = $('#logoutBtn').hidden = true;
     document.body.classList.remove('is-editing-site');
     $('#password').focus();
   }
 
-  const TABS = ['orders', 'products', 'site'];
+  const TABS = ['orders', 'products', 'site', 'settings'];
 
   async function showApp() {
     $('#loginView').hidden = true;
@@ -60,6 +60,7 @@
     // The website editor uses the full window width.
     document.body.classList.toggle('is-editing-site', tab === 'site');
     if (tab === 'site' && window.AdminSite) window.AdminSite.open();
+    if (tab === 'settings' && window.AdminSettings) window.AdminSettings.open();
     history.replaceState(null, '', `#${tab}`);
   }
 
@@ -99,7 +100,8 @@
   }
 
   async function updateOrder(id, changes) {
-    if (changes.status === 'cancelled' && !confirm(`Cancel order ${id}? Its items will be returned to stock. This can't be undone.`)) { renderOrders(); return null; }
+    const current = orders.find((o) => o.id === id);
+    if (changes.status === 'cancelled' && current?.status !== 'cancelled' && !confirm(`Cancel order ${id}? Its items will be returned to stock. This can't be undone.`)) { renderOrders(); return null; }
     try {
       const updated = await api(`/orders/${encodeURIComponent(id)}`, { method: 'PATCH', body: changes });
       orders = orders.map((o) => (o.id === id ? updated : o));

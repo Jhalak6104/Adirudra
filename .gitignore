@@ -6,3 +6,4 @@ data/*.tmp
 data/site.json
 data/site-history.json
 data/uploads/
+data/settings.json
