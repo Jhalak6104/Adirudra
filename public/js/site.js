@@ -21,10 +21,20 @@
 
   let site = window.SITE || null;
 
+  // {freeShippingOver}, {shippingFee}, {codFee} come from Admin > Settings; pages can pass more (e.g. {name}).
+  const money = (n) => '₹' + Math.round(Number(n) || 0).toLocaleString('en-IN');
+  function fill(text, vars = {}) {
+    const shop = (window.Store && Store.CONFIG && Store.CONFIG.codFee !== undefined) ? Store.CONFIG : (window.SHOP || {});
+    const all = { freeShippingOver: money(shop.freeShippingOver), shippingFee: money(shop.shippingFee), codFee: money(shop.codFee), ...vars };
+    return String(text ?? '').replace(/\{(\w+)\}/g, (m, k) => (k in all ? String(all[k]) : m));
+  }
+  // Plain text for a setting, e.g. Site.t('pages.cart.title'); returns '' if missing.
+  const t = (path, vars) => fill(site ? get(site, path) : '', vars);
+
   const LISTS = {
-    'trust.items': (items) => items.map((t) => `<div class="trust__item"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON_PATHS[t.icon] || ICON_PATHS.shield}</svg><div><strong>${esc(t.title)}</strong><span>${esc(t.text)}</span></div></div>`).join(''),
-    'authenticity.steps': (items) => items.map((s, i) => `<div><span class="step-number">${String(i + 1).padStart(2, '0')}</span><h3>${esc(s.title)}</h3><p>${esc(s.text)}</p></div>`).join(''),
-    'faq.items': (items) => items.map((f) => `<div><span class="step-number">Q</span><h3>${esc(f.q)}</h3><p>${esc(f.a)}</p></div>`).join('')
+    'trust.items': (items) => items.map((x) => `<div class="trust__item"><svg viewBox="0 0 24 24" aria-hidden="true">${ICON_PATHS[x.icon] || ICON_PATHS.shield}</svg><div><strong>${esc(fill(x.title))}</strong><span>${esc(fill(x.text))}</span></div></div>`).join(''),
+    'authenticity.steps': (items) => items.map((s, i) => `<div><span class="step-number">${String(i + 1).padStart(2, '0')}</span><h3>${esc(fill(s.title))}</h3><p>${esc(fill(s.text))}</p></div>`).join(''),
+    'faq.items': (items) => items.map((f) => `<div><span class="step-number">Q</span><h3>${esc(fill(f.q))}</h3><p>${esc(fill(f.a))}</p></div>`).join('')
   };
 
   function applyTheme(theme) {
@@ -51,21 +61,31 @@
       const skip = document.querySelector('.skip-link');
       (skip ? skip.after(bar) : document.body.prepend(bar));
     }
-    bar.innerHTML = a.link ? `<a href="${esc(a.link)}">${esc(a.text)}</a>` : esc(a.text);
+    bar.innerHTML = a.link ? `<a href="${esc(a.link)}">${esc(fill(a.text))}</a>` : esc(fill(a.text));
   }
 
   function apply(root = document) {
     if (!site) return;
     root.querySelectorAll('[data-site]').forEach((el) => {
-      const v = get(site, el.dataset.site);
-      if (typeof v === 'string' && el.textContent !== v) el.textContent = v;
+      let v = get(site, el.dataset.site);
+      if (typeof v !== 'string') return;
+      v = fill(v);
+      if (el.textContent !== v) el.textContent = v;
+      // Menu and footer links with an empty label are hidden.
+      if (el.hasAttribute('data-site-hide-empty')) (el.closest('li') || el).hidden = !v;
+    });
+    root.querySelectorAll('[data-site-placeholder]').forEach((el) => {
+      const v = get(site, el.dataset.sitePlaceholder);
+      if (typeof v === 'string') el.setAttribute('placeholder', fill(v));
     });
     root.querySelectorAll('[data-site-href]').forEach((el) => {
       const v = get(site, el.dataset.siteHref);
       if (typeof v === 'string') el.setAttribute('href', v || '#');
     });
     root.querySelectorAll('[data-site-src]').forEach((el) => {
-      const v = get(site, el.dataset.siteSrc);
+      let v = get(site, el.dataset.siteSrc);
+      // Pages served at any path (404) need root-relative asset links.
+      if (v && el.hasAttribute('data-site-abs') && /^assets\//.test(v)) v = `/${v}`;
       if (v && el.getAttribute('src') !== v) el.setAttribute('src', v);
     });
     root.querySelectorAll('[data-site-bg]').forEach((el) => {
@@ -126,11 +146,13 @@
       applyTheme(site.theme);
       apply();
       renderHome();
+      // Pages that build text with scripts (cart, product, shop, checkout) re-render on this.
+      window.dispatchEvent(new Event('site:update'));
     });
     // Tell the editor we're ready to receive the current draft.
     window.addEventListener('load', () => { if (window.parent !== window) window.parent.postMessage({ type: 'adr-preview-ready' }, location.origin); });
   }
 
-  window.Site = { apply, renderHome, get data() { return site; } };
+  window.Site = { apply, renderHome, t, fill, get data() { return site; } };
   apply(); // the page content above this script is already parsed
 })();

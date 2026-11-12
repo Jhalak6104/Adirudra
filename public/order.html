@@ -23,13 +23,15 @@
   <script>
     Store.onReady(async () => {
       const { api, money, esc, $, ICONS, MyOrders } = Store;
+      // Editable text from Admin > Website > Order confirmation page.
+      const T = (key, vars) => esc(Site.t(`pages.order.${key}`, vars));
       const params = new URLSearchParams(location.search);
       const id = params.get('id') || '';
       const token = params.get('token') || (MyOrders.all().find((o) => o.id === id) || {}).token || '';
       const root = $('#orderRoot');
 
       const notFound = () => {
-        root.innerHTML = '<h1 class="page-title">Order not found</h1><p class="muted">Use the link from your order confirmation, or contact us with your order number.</p><div class="confirm__actions" style="margin-top:24px"><a class="button button--dark" href="shop.html">Continue shopping</a></div>';
+        root.innerHTML = `<h1 class="page-title">${T('notFoundTitle')}</h1><p class="muted">${T('notFoundText')}</p><div class="confirm__actions" style="margin-top:24px"><a class="button button--dark" href="shop.html">Continue shopping</a></div>`;
       };
 
       async function load() {
@@ -42,19 +44,18 @@
       function render(order) {
         const c = order.customer;
         const unpaidOnline = order.payment === 'upi' && order.paymentStatus === 'unpaid' && order.status !== 'cancelled';
-        const headline = order.status === 'cancelled' ? 'This order was cancelled.'
-          : unpaidOnline ? 'Your order is reserved.' : 'Your order is placed.';
-        const next = order.status === 'cancelled' ? 'If you have questions, contact us with your order number.'
-          : order.paymentStatus === 'paid' ? `Payment received — thank you. We'll email <strong>${esc(c.email)}</strong> when it ships.`
-          : order.payment === 'cod' ? `Your order is confirmed. Please keep <strong>${money(order.total)}</strong> ready when it arrives.`
-          : order.payment === 'whatsapp' ? 'Send us the WhatsApp message we opened and we\'ll confirm payment and delivery with you there.'
-          : order.razorpay ? 'Your payment hasn\'t gone through yet. Complete it below to confirm your order.'
-          : `We'll send a secure payment link to <strong>${esc(c.phone)}</strong> and <strong>${esc(c.email)}</strong> shortly. Your order ships once payment is received.`;
+        const vars = { name: c.name.split(' ')[0], email: c.email, phone: c.phone, total: money(order.total) };
+        const headline = T(order.status === 'cancelled' ? 'cancelledTitle' : unpaidOnline ? 'reservedTitle' : 'placedTitle');
+        const next = T(order.status === 'cancelled' ? 'cancelledText'
+          : order.paymentStatus === 'paid' ? 'paidText'
+          : order.payment === 'cod' ? 'codText'
+          : order.payment === 'whatsapp' ? 'whatsappText'
+          : order.razorpay ? 'payNowText' : 'payLinkText', vars);
         const statusText = { pending: 'Pending', confirmed: 'Confirmed', shipped: 'Shipped', delivered: 'Delivered', cancelled: 'Cancelled' }[order.status] || order.status;
 
         root.innerHTML = `
           <div class="confirm__mark">${ICONS.check}</div>
-          <p class="kicker">Thank you, ${esc(c.name.split(' ')[0])}</p>
+          <p class="kicker">${T('thanks', vars)}</p>
           <h1 class="page-title">${headline}</h1>
           <p class="muted" style="font-size:15px">${next}</p>
           ${order.razorpay ? `<p style="margin-top:20px"><button class="button button--dark" type="button" id="payNow">Pay ${money(order.total)} now</button></p>` : ''}

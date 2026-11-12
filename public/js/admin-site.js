@@ -74,11 +74,18 @@
       { type: 'range', path: 'theme.radius', label: 'Corner rounding', min: 0, max: 24, unit: 'px' }
     ] },
     { id: 'brand', title: 'Brand & announcement bar', fields: [
+      { type: 'note', text: 'Tip: in any text you can write {freeShippingOver}, {shippingFee} or {codFee} to show the current amount from Settings.' },
       text('brand.name', 'Store name (header & footer)'),
       { type: 'image', path: 'brand.logo', label: 'Logo' },
       { type: 'toggle', path: 'announcement.enabled', label: 'Show announcement bar at the top of every page' },
       text('announcement.text', 'Announcement text'),
       text('announcement.link', 'Announcement link (optional)', { placeholder: 'shop.html' })
+    ] },
+    { id: 'nav', title: 'Header menu', fields: [
+      { type: 'note', text: 'Leave a label empty to hide that link.' },
+      text('nav.home', 'Home link'), text('nav.shop', 'Shop link'), text('nav.malas', 'Malas link'),
+      text('nav.bracelets', 'Bracelets link'), text('nav.authenticity', 'Authenticity link'),
+      text('nav.searchPlaceholder', 'Search box hint')
     ] },
     { id: 'hero', title: 'Hero banner', fields: [
       { type: 'image', path: 'hero.image', label: 'Background image', hint: 'Wide photo, at least 1600px across. The left side sits behind the text.' },
@@ -102,12 +109,12 @@
     ] },
     { id: 'featured', title: 'Featured products section', fields: [
       text('featured.kicker', 'Small heading'), text('featured.title', 'Heading'), area('featured.intro', 'Intro'),
-      text('featured.linkLabel', '"View all" link text'),
+      text('featured.linkLabel', '"View all" link text'), text('featured.link', '"View all" link target', { placeholder: 'shop.html' }),
       { type: 'range', path: 'featured.count', label: 'Products shown', min: 3, max: 12, unit: '' }
     ] },
     { id: 'authenticity', title: 'Authenticity section', fields: [
       text('authenticity.kicker', 'Small heading'), area('authenticity.title', 'Heading', { rows: 2 }), area('authenticity.text', 'Paragraph'),
-      text('authenticity.linkLabel', 'Link text'),
+      text('authenticity.linkLabel', 'Link text'), text('authenticity.link', 'Link target', { placeholder: 'shop.html' }),
       { type: 'list', path: 'authenticity.steps', min: 1, max: 6, addLabel: 'Add step', newItem: { title: 'New step', text: '' }, itemLabel: (it, i) => `${String(i + 1).padStart(2, '0')} · ${it.title}`,
         item: [{ type: 'text', key: 'title', label: 'Title' }, { type: 'textarea', key: 'text', label: 'Text' }] }
     ] },
@@ -117,7 +124,48 @@
         item: [{ type: 'text', key: 'q', label: 'Question' }, { type: 'textarea', key: 'a', label: 'Answer' }] }
     ] },
     { id: 'footer', title: 'Footer', fields: [
-      area('footer.about', 'About text'), text('footer.copyright', 'Copyright line (after © year)'), text('footer.note', 'Small note (right side)')
+      area('footer.about', 'About text'), text('footer.copyright', 'Copyright line (after © year)'), text('footer.note', 'Small note (right side)'),
+      { type: 'note', text: 'Column headings and links. The Shop column uses the category names from "Shop-by-category section". Leave a link label empty to hide it.' },
+      text('footer.shopTitle', 'Shop column heading'), text('footer.helpTitle', 'Help column heading'), text('footer.contactTitle', 'Contact column heading'),
+      text('footer.cartLabel', '"Your cart" link'), text('footer.authenticityLabel', '"Authenticity" link'), text('footer.faqLabel', '"Shipping & returns" link'),
+      text('footer.whatsappLabel', '"WhatsApp us" link')
+    ] },
+    { id: 'pageShop', title: 'Shop page', fields: [
+      text('pages.shop.title', 'Heading'), area('pages.shop.intro', 'Intro'), text('pages.shop.searchPlaceholder', 'Search box hint'),
+      text('pages.shop.emptyTitle', 'No results: heading'), area('pages.shop.emptyText', 'No results: text', { rows: 2 })
+    ] },
+    { id: 'pageProduct', title: 'Product page', fields: [
+      text('pages.product.taxNote', 'Note under the price'),
+      text('pages.product.certified', 'Assurance: certified products'), text('pages.product.inspected', 'Assurance: other products'),
+      text('pages.product.shipping', 'Assurance: shipping'), text('pages.product.returns', 'Assurance: returns'), text('pages.product.askLabel', 'WhatsApp question link'),
+      text('pages.product.relatedKicker', 'Related: small heading'), text('pages.product.relatedTitle', 'Related: heading'),
+      text('pages.product.notFoundTitle', 'Not found: heading'), area('pages.product.notFoundText', 'Not found: text', { rows: 2 })
+    ] },
+    { id: 'pageCart', title: 'Cart page', fields: [
+      text('pages.cart.title', 'Heading'), text('pages.cart.summaryTitle', 'Summary heading'), text('pages.cart.checkoutButton', 'Checkout button'),
+      text('pages.cart.freeShippingNote', 'Note when shipping is free'),
+      text('pages.cart.emptyTitle', 'Empty cart: heading'), area('pages.cart.emptyText', 'Empty cart: text', { rows: 2 }), text('pages.cart.emptyButton', 'Empty cart: button')
+    ] },
+    { id: 'pageCheckout', title: 'Checkout page', fields: [
+      text('pages.checkout.title', 'Heading'), text('pages.checkout.contactHeading', 'Step 1 heading'), text('pages.checkout.addressHeading', 'Step 2 heading'),
+      text('pages.checkout.paymentHeading', 'Step 3 heading'), text('pages.checkout.summaryTitle', 'Summary heading'),
+      text('pages.checkout.onlineTitle', 'Online payment: title'), area('pages.checkout.onlineText', 'Online payment: text (Razorpay on)', { rows: 2 }),
+      area('pages.checkout.onlineTextNoGateway', 'Online payment: text (Razorpay off)', { rows: 2 }),
+      text('pages.checkout.codTitle', 'Cash on delivery: title'), area('pages.checkout.codText', 'Cash on delivery: text', { rows: 2 }),
+      text('pages.checkout.whatsappTitle', 'WhatsApp: title'), area('pages.checkout.whatsappText', 'WhatsApp: text', { rows: 2 })
+    ] },
+    { id: 'pageOrder', title: 'Order confirmation page', fields: [
+      { type: 'note', text: 'You can also use {name} (first name), {email}, {phone} and {total} here.' },
+      text('pages.order.thanks', 'Small heading'),
+      text('pages.order.placedTitle', 'Heading: order placed'), text('pages.order.reservedTitle', 'Heading: awaiting online payment'), text('pages.order.cancelledTitle', 'Heading: cancelled'),
+      area('pages.order.paidText', 'Text: paid online', { rows: 2 }), area('pages.order.codText', 'Text: cash on delivery', { rows: 2 }),
+      area('pages.order.whatsappText', 'Text: WhatsApp order', { rows: 2 }), area('pages.order.payNowText', 'Text: payment not finished', { rows: 2 }),
+      area('pages.order.payLinkText', 'Text: payment link will be sent', { rows: 2 }), area('pages.order.cancelledText', 'Text: cancelled', { rows: 2 }),
+      text('pages.order.notFoundTitle', 'Not found: heading'), area('pages.order.notFoundText', 'Not found: text', { rows: 2 })
+    ] },
+    { id: 'page404', title: 'Page-not-found (404) page', fields: [
+      text('pages.notFound.kicker', 'Small heading'), text('pages.notFound.title', 'Heading'), area('pages.notFound.text', 'Text', { rows: 2 }),
+      text('pages.notFound.primaryLabel', 'Shop button'), text('pages.notFound.secondaryLabel', 'Home button')
     ] },
     { id: 'seo', title: 'Search engines (SEO)', fields: [
       text('seo.title', 'Page title (browser tab & Google)'), area('seo.description', 'Description (shown under the title in Google)')
@@ -175,6 +223,8 @@
           </div>`).join('')}
           ${items.length < f.max ? `<button type="button" class="button button--outline ed-small" data-list-add="${f.path}">+ ${esc(f.addLabel)}</button>` : `<small class="ed-hint">Maximum of ${f.max} reached.</small>`}</div>`;
       }
+      case 'note':
+        return `<p class="ed-hint ed-note">${esc(f.text)}</p>`;
       case 'history':
         return `<div class="ed-history">${history.length ? `<ul>${history.map((h) => `<li><span>${esc(new Date(h.savedAt).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }))}<br><small class="muted">${esc(h.label)}</small></span><button type="button" class="text-link" data-restore="${esc(h.id)}">Restore</button></li>`).join('')}</ul>` : '<p class="muted">No earlier versions yet. Each time you publish, the previous version is kept here (up to 15).</p>'}
           <button type="button" class="text-link ed-reset" id="resetSite">Reset everything to the original design</button></div>`;
@@ -366,6 +416,15 @@
     else if (t.id === 'resetSite') resetAll();
   }
 
+  // Point the "Product page" preview at a product that is actually in the store.
+  async function pickPreviewProduct() {
+    try {
+      const list = await fetch('/api/products').then((r) => r.json());
+      const opt = $('#edPage option[data-product]');
+      if (opt && list.length) opt.value = `/product.html?id=${encodeURIComponent(list[0].id)}&preview=1`;
+    } catch { /* keep the default */ }
+  }
+
   function setPreviewPage(url) {
     $('#edPreview').src = url;
   }
@@ -421,6 +480,7 @@
       if (e.origin === location.origin && e.data && e.data.type === 'adr-preview-ready') pushPreview(true);
     });
     window.addEventListener('beforeunload', (e) => { if (isDirty()) { e.preventDefault(); e.returnValue = ''; } });
+    await pickPreviewProduct();
     setPreviewPage($('#edPage').value);
   }
 

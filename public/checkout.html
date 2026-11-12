@@ -19,17 +19,17 @@
   <main id="main">
     <div class="shell page-head">
       <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a> / <a href="cart.html">Cart</a> / <span>Checkout</span></nav>
-      <h1 class="page-title">Checkout</h1>
+      <h1 class="page-title" data-site="pages.checkout.title">Checkout</h1>
     </div>
 
     <div class="shell" id="emptyCheckout" hidden>
-      <div class="empty-state" style="margin-bottom:100px"><h3>Your cart is empty</h3><p>Add something to your cart before checking out.</p><a class="button button--dark" href="shop.html">Go to the shop</a></div>
+      <div class="empty-state" style="margin-bottom:100px"><h3 data-site="pages.cart.emptyTitle">Your cart is empty</h3><p>Add something to your cart before checking out.</p><a class="button button--dark" href="shop.html">Go to the shop</a></div>
     </div>
 
     <form class="shell checkout-layout" id="checkoutForm" novalidate>
       <div>
         <section class="form-section">
-          <h2><span>01</span> Contact</h2>
+          <h2><span>01</span> <span data-site="pages.checkout.contactHeading">Contact</span></h2>
           <div class="form-grid">
             <div class="field"><label for="name">Full name</label><input class="input" id="name" name="name" autocomplete="name" required><span class="field__error"></span></div>
             <div class="field"><label for="phone">Mobile number</label><input class="input" id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="10-digit mobile" required pattern="[6-9][0-9]{9}"><span class="field__error"></span></div>
@@ -38,7 +38,7 @@
         </section>
 
         <section class="form-section">
-          <h2><span>02</span> Delivery address</h2>
+          <h2><span>02</span> <span data-site="pages.checkout.addressHeading">Delivery address</span></h2>
           <div class="form-grid">
             <div class="field full"><label for="address">Address</label><input class="input" id="address" name="address" autocomplete="street-address" placeholder="House no., street, area" required><span class="field__error"></span></div>
             <div class="field"><label for="city">City</label><input class="input" id="city" name="city" autocomplete="address-level2" required><span class="field__error"></span></div>
@@ -49,17 +49,17 @@
         </section>
 
         <section class="form-section">
-          <h2><span>03</span> Payment</h2>
+          <h2><span>03</span> <span data-site="pages.checkout.paymentHeading">Payment</span></h2>
           <div class="pay-options" role="radiogroup" aria-label="Payment method">
-            <label class="pay-option"><input type="radio" name="payment" value="upi" checked><div><strong>UPI / Cards / Netbanking</strong><span id="upiDesc">Pay securely online.</span></div></label>
-            <label class="pay-option"><input type="radio" name="payment" value="cod"><div><strong>Cash on delivery</strong><span>Pay when your order arrives. ₹49 handling fee.</span></div></label>
-            <label class="pay-option"><input type="radio" name="payment" value="whatsapp"><div><strong>Confirm on WhatsApp</strong><span>Send your order to us on WhatsApp and pay however you prefer.</span></div></label>
+            <label class="pay-option"><input type="radio" name="payment" value="upi" checked><div><strong data-site="pages.checkout.onlineTitle">UPI / Cards / Netbanking</strong><span id="upiDesc">Pay securely online.</span></div></label>
+            <label class="pay-option"><input type="radio" name="payment" value="cod"><div><strong data-site="pages.checkout.codTitle">Cash on delivery</strong><span data-site="pages.checkout.codText">Pay when your order arrives.</span></div></label>
+            <label class="pay-option"><input type="radio" name="payment" value="whatsapp"><div><strong data-site="pages.checkout.whatsappTitle">Confirm on WhatsApp</strong><span data-site="pages.checkout.whatsappText">Send your order to us on WhatsApp and pay however you prefer.</span></div></label>
           </div>
         </section>
       </div>
 
       <aside class="summary" aria-labelledby="sumHeading">
-        <h2 id="sumHeading">Your order</h2>
+        <h2 id="sumHeading" data-site="pages.checkout.summaryTitle">Your order</h2>
         <div class="mini-items" id="miniItems"></div>
         <div id="sumRows"></div>
         <button class="button button--dark button--block" type="submit" id="placeBtn" style="margin-top:18px">Place order</button>

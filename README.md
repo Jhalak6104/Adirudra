@@ -52,7 +52,9 @@ test/                API and pricing tests (node:test)
 ### Website editor (`/admin` → Website)
 Edit the storefront's look and content with a live preview, then press **Publish**:
 - **Colours & fonts:** 10 base colours (all other shades are blended from these), 5 ready-made palettes, heading and body fonts from a curated Google Fonts list, and corner rounding. A readability check warns when text colours are too hard to read.
-- **Content:** brand name and logo, an announcement bar, the hero banner (text, links, background image), trust badges, the category, featured, authenticity and FAQ sections (add, remove and reorder items), the footer, and the SEO title and description.
+- **Content:** brand name and logo, an announcement bar, the header menu labels, the hero banner (text, links, background image), trust badges, the category, featured, authenticity and FAQ sections (add, remove and reorder items, and where their links go), the footer (text, column headings and link labels), and the SEO title and description.
+- **Other pages:** the text on the shop, product, cart, checkout, order-confirmation and 404 pages. Leave a menu or footer link label empty to hide that link.
+- **Amounts in text:** write `{freeShippingOver}`, `{shippingFee}` or `{codFee}` in any text to show the current amount from Admin → Settings. Order-page text can also use `{name}`, `{email}`, `{phone}` and `{total}`.
 - **Layout:** show, hide or reorder the homepage sections.
 - **Images:** upload JPG/PNG/WebP/GIF (max 5 MB). Files are stored in `data/uploads/`. Product photos can be uploaded from the product form too.
 - **Safety:** every value is checked on the server (colours, allowed fonts, safe links only, image paths). The last 15 published versions are kept under **Version history**, and **Reset** returns to the original design.

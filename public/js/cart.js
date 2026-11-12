@@ -4,12 +4,15 @@
   const { Cart, quote, money, esc, $, visual, getCoupon, setCoupon } = Store;
   let couponMsg = { text: '', ok: true };
   let renderSeq = 0;
+  // Editable text from Admin > Website; data-site lets the live preview update it in place.
+  const T = (key, vars) => (window.Site ? Site.t(`pages.${key}`, vars) : '');
+  const txt = (tag, key, attrs = '') => `<${tag} data-site="pages.${key}"${attrs}>${esc(T(key))}</${tag}>`;
 
   function summaryHtml(t) {
     const toFree = Store.CONFIG.freeShippingOver - (t.subtotal - t.discount);
     const applied = Boolean(t.coupon);
     return `<aside class="summary" aria-labelledby="sumHeading">
-      <h2 id="sumHeading">Order summary</h2>
+      ${txt('h2', 'cart.summaryTitle', ' id="sumHeading"')}
       <div class="summary-row"><span>Subtotal</span><span>${money(t.subtotal)}</span></div>
       ${t.discount ? `<div class="summary-row"><span>Discount (${esc(t.coupon)})</span><span class="discount">−${money(t.discount)}</span></div>` : ''}
       <div class="summary-row"><span>Shipping</span><span>${t.shipping ? money(t.shipping) : 'Free'}</span></div>
@@ -19,8 +22,8 @@
         ${applied ? '<button class="button button--outline" type="button" id="removeCoupon">Remove</button>' : '<button class="button button--outline" type="submit">Apply</button>'}
       </form>
       <p class="coupon-msg ${couponMsg.ok ? 'ok' : 'err'}" aria-live="polite">${esc(couponMsg.text)}</p>
-      <p class="ship-note">${toFree > 0 ? `Add ${money(toFree)} more for free shipping.` : 'Your order ships free.'}</p>
-      <a class="button button--dark button--block" href="checkout.html">Proceed to checkout</a>
+      <p class="ship-note">${toFree > 0 ? `Add ${money(toFree)} more for free shipping.` : txt('span', 'cart.freeShippingNote')}</p>
+      <a class="button button--dark button--block" href="checkout.html" data-site="pages.cart.checkoutButton">${esc(T('cart.checkoutButton'))}</a>
       <a class="text-link" href="shop.html">Continue shopping</a>
     </aside>`;
   }
@@ -29,7 +32,7 @@
     const seq = ++renderSeq;
     const root = $('#cartRoot');
     if (!Cart.items().length) {
-      root.innerHTML = '<div class="empty-state" style="margin-bottom:100px"><h3>Your cart is empty</h3><p>Explore certified Rudraksha beads, malas and bracelets.</p><a class="button button--dark" href="shop.html">Start shopping</a></div>';
+      root.innerHTML = `<div class="empty-state" style="margin-bottom:100px">${txt('h3', 'cart.emptyTitle')}${txt('p', 'cart.emptyText')}<a class="button button--dark" href="shop.html" data-site="pages.cart.emptyButton">${esc(T('cart.emptyButton'))}</a></div>`;
       return;
     }
     let t;

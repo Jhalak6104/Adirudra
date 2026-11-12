@@ -14,12 +14,14 @@
   };
 
   const payment = () => ($('input[name=payment]:checked') || {}).value || 'upi';
+  // In the admin's live preview, show the form even with an empty cart so its text can be edited.
+  const isPreview = document.documentElement.classList.contains('is-preview');
   let submitting = false;
 
   async function renderSummary() {
     let t;
     try { t = await quote({ payment: payment() }); } catch (err) { $('#sumRows').innerHTML = `<p class="field__error">${esc(err.message)}</p>`; return; }
-    if (!t.lines.length) { showEmpty(); return; }
+    if (!t.lines.length) { if (!isPreview) showEmpty(); return; }
     $('#miniItems').innerHTML = t.lines.map((l) => `
       <div class="mini-item">
         <div class="mini-item__thumb">${visual(l.product, true)}<span class="mini-item__qty">${l.qty}</span></div>
@@ -73,12 +75,11 @@
   }
 
   Store.onReady(() => {
-    if (!Cart.items().length) { showEmpty(); return; }
+    if (!Cart.items().length && !isPreview) { showEmpty(); return; }
 
     $('#state').insertAdjacentHTML('beforeend', Store.CONFIG.states.map((s) => `<option>${esc(s)}</option>`).join(''));
-    $('#upiDesc').textContent = Store.CONFIG.razorpay
-      ? 'Pay securely online with Razorpay: UPI, cards, netbanking or wallets.'
-      : "We'll send a secure payment link to your phone and email once the order is placed.";
+    $('#upiDesc').dataset.site = Store.CONFIG.razorpay ? 'pages.checkout.onlineText' : 'pages.checkout.onlineTextNoGateway';
+    if (window.Site) Site.apply($('#checkoutForm'));
     renderSummary();
 
     const form = $('#checkoutForm');

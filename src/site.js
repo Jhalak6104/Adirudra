@@ -19,7 +19,8 @@ export const DEFAULTS = {
     radius: 0
   },
   brand: { name: 'ADIRUDRA', logo: 'assets/logo.svg' },
-  announcement: { enabled: false, text: 'Free shipping on orders over ₹999 · Every bead lab certified', link: 'shop.html' },
+  announcement: { enabled: false, text: 'Free shipping on orders over {freeShippingOver} · Every bead lab certified', link: 'shop.html' },
+  nav: { home: 'Home', shop: 'Shop all', malas: 'Malas', bracelets: 'Bracelets', authenticity: 'Authenticity', searchPlaceholder: 'Search by mukhi, origin, mala, bracelet…' },
   seo: {
     title: 'Adirudra — Authentic Rudraksha Store',
     description: 'Shop authentic, lab-certified Rudraksha beads, malas, bracelets and pendants from Nepal and Indonesia.'
@@ -36,7 +37,7 @@ export const DEFAULTS = {
   trust: {
     items: [
       { icon: 'shield', title: 'Lab certified', text: 'Certificate with every bead' },
-      { icon: 'truck', title: 'Free shipping', text: 'On orders over ₹999' },
+      { icon: 'truck', title: 'Free shipping', text: 'On orders over {freeShippingOver}' },
       { icon: 'return', title: '7-day returns', text: "If it isn't right, send it back" },
       { icon: 'card', title: 'Secure payment', text: 'UPI, cards & cash on delivery' }
     ]
@@ -49,12 +50,12 @@ export const DEFAULTS = {
   featured: {
     kicker: 'The collection', title: 'Featured & rare',
     intro: "Hand-picked beads from this season's sourcing, including our rarest pieces.",
-    linkLabel: 'View all products →', count: 6
+    linkLabel: 'View all products →', link: 'shop.html', count: 6
   },
   authenticity: {
     kicker: 'Our promise', title: 'Every bead, verified before it reaches you.',
     text: 'Counterfeit and treated beads are common. We source directly, test every piece and give each one a verification number you can check with us at any time.',
-    linkLabel: 'Shop certified beads →',
+    linkLabel: 'Shop certified beads →', link: 'shop.html',
     steps: [
       { title: 'Direct sourcing', text: 'Collected from trusted growers in Nepal and Indonesia, never from bulk resellers.' },
       { title: 'Lab testing', text: 'X-ray and density tests confirm natural mukhis with no carving, filling or joins.' },
@@ -67,19 +68,60 @@ export const DEFAULTS = {
     items: [
       { q: 'How long does delivery take?', a: 'Orders ship within 1–2 working days and arrive in 3–7 days across India.' },
       { q: 'What is the return policy?', a: 'Unworn items can be returned within 7 days of delivery for a full refund.' },
-      { q: 'Is cash on delivery available?', a: 'Yes, on all orders, with a small handling fee of ₹49.' }
+      { q: 'Is cash on delivery available?', a: 'Yes, on all orders, with a small handling fee of {codFee}.' }
     ]
   },
   footer: {
+    shopTitle: 'Shop', helpTitle: 'Help', contactTitle: 'Contact',
+    cartLabel: 'Your cart', authenticityLabel: 'Authenticity', faqLabel: 'Shipping & returns', whatsappLabel: 'WhatsApp us',
     about: 'Authentic, lab-certified Rudraksha from Nepal and Indonesia. Every bead is inspected, energised and shipped with its certificate.',
     copyright: 'Adirudra. All rights reserved.',
     note: 'Prices include GST'
+  },
+  // Text on the other storefront pages. {freeShippingOver}, {shippingFee} and {codFee} are replaced
+  // with the amounts from Admin > Settings; order texts also accept {name}, {email}, {phone}, {total}.
+  pages: {
+    shop: {
+      title: 'The collection', intro: 'Authentic Rudraksha beads, malas, bracelets and pendants — every piece certified.',
+      searchPlaceholder: 'Mukhi, origin, keyword…', emptyTitle: 'No products match', emptyText: 'Try removing a filter or searching for something else.'
+    },
+    product: {
+      relatedKicker: 'You may also like', relatedTitle: 'Related pieces', taxNote: 'Inclusive of all taxes',
+      certified: 'Lab certificate included', inspected: 'Inspected for authenticity', shipping: 'Ships in 1–2 working days', returns: '7-day easy returns',
+      askLabel: 'Ask about this bead on WhatsApp', notFoundTitle: 'Product not found', notFoundText: 'It may have sold out or the link is incorrect.'
+    },
+    cart: {
+      title: 'Your cart', emptyTitle: 'Your cart is empty', emptyText: 'Explore certified Rudraksha beads, malas and bracelets.', emptyButton: 'Start shopping',
+      summaryTitle: 'Order summary', checkoutButton: 'Proceed to checkout', freeShippingNote: 'Your order ships free.'
+    },
+    checkout: {
+      title: 'Checkout', contactHeading: 'Contact', addressHeading: 'Delivery address', paymentHeading: 'Payment',
+      onlineTitle: 'UPI / Cards / Netbanking', onlineText: 'Pay securely online with Razorpay: UPI, cards, netbanking or wallets.',
+      onlineTextNoGateway: "We'll send a secure payment link to your phone and email once the order is placed.",
+      codTitle: 'Cash on delivery', codText: 'Pay when your order arrives. {codFee} handling fee.',
+      whatsappTitle: 'Confirm on WhatsApp', whatsappText: 'Send your order to us on WhatsApp and pay however you prefer.',
+      summaryTitle: 'Your order'
+    },
+    order: {
+      thanks: 'Thank you, {name}', placedTitle: 'Your order is placed.', reservedTitle: 'Your order is reserved.', cancelledTitle: 'This order was cancelled.',
+      paidText: "Payment received — thank you. We'll email {email} when it ships.",
+      codText: 'Your order is confirmed. Please keep {total} ready when it arrives.',
+      whatsappText: "Send us the WhatsApp message we opened and we'll confirm payment and delivery with you there.",
+      payNowText: "Your payment hasn't gone through yet. Complete it below to confirm your order.",
+      payLinkText: "We'll send a secure payment link to {phone} and {email} shortly. Your order ships once payment is received.",
+      cancelledText: 'If you have questions, contact us with your order number.',
+      notFoundTitle: 'Order not found', notFoundText: 'Use the link from your order confirmation, or contact us with your order number.'
+    },
+    notFound: {
+      kicker: '404', title: 'This page has wandered off.', text: 'The link may be broken or the page may have moved.',
+      primaryLabel: 'Browse the shop', secondaryLabel: 'Back to home'
+    }
   }
 };
 
 // ---------- Validation ----------
 const LIST_LIMITS = { 'trust.items': [1, 6], 'authenticity.steps': [1, 6], 'faq.items': [0, 12] };
-const LONG_TEXT = /^(lead|text|intro|about|description|a)$/;
+const LONG_TEXT = /^(lead|text|intro|about|description|a)$|Text(NoGateway)?$/;
 const NUMBERS = { 'theme.radius': [0, 24], 'featured.count': [3, 12] };
 
 const isColor = (v) => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v);

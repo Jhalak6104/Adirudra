@@ -167,3 +167,5 @@ body.is-editing-site .admin-main { max-width: none; width: 100%; margin: 0; padd
 #couponsTable td.has-error .input, #couponsTable td.has-error .select { border-color: var(--danger); }
 #couponsTable td .field__error { display: block; margin-top: 4px; white-space: normal; }
 @media (max-width: 860px) { .settings-card { padding: 18px; } .settings-card .form-grid { grid-template-columns: 1fr; } }
+
+.ed-note { display: block; margin: 0 0 12px; padding: 8px 10px; background: var(--paper); border-left: 2px solid var(--gold); }

@@ -310,7 +310,9 @@ export function createApp(db, siteStore, settingsStore = createSettingsStore(con
       pageCache.set(name, html);
     }
     const site = siteStore.get();
-    const head = `<style id="site-theme">${themeCss(site.theme)}</style>\n<script>window.SITE=${safeJson(site)};</script>\n`;
+    // Fee amounts let texts like "{codFee} handling fee" render before the API has loaded.
+    const shop = { freeShippingOver: config.shop.freeShippingOver, shippingFee: config.shop.shippingFee, codFee: config.shop.codFee };
+    const head = `<style id="site-theme">${themeCss(site.theme)}</style>\n<script>window.SITE=${safeJson(site)};window.SHOP=${safeJson(shop)};</script>\n`;
     html = html
       .replace(/https:\/\/fonts\.googleapis\.com\/css2\?[^"]+/, escHtml(fontsUrl(site.theme)))
       .replace('</head>', `${head}</head>`);

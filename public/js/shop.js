@@ -5,6 +5,9 @@
   let products = [];
   const params = new URLSearchParams(location.search);
   const RARITY_ORDER = ['Common', 'Uncommon', 'Rare', 'Extremely Rare'];
+  // Editable text from Admin > Website; data-site lets the live preview update it in place.
+  const T = (key, vars) => (window.Site ? Site.t(`pages.${key}`, vars) : '');
+  const txt = (tag, key, attrs = '') => `<${tag} data-site="pages.${key}"${attrs}>${esc(T(key))}</${tag}>`;
 
   const state = {
     q: params.get('q') || '',
@@ -68,10 +71,13 @@
     $('#count').textContent = `${list.length} of ${products.length} products`;
     $('#grid').innerHTML = list.length
       ? list.map(productCard).join('')
-      : '<div class="empty-state"><h3>No products match</h3><p>Try removing a filter or searching for something else.</p><button class="button button--dark" type="button" data-reset>Clear filters</button></div>';
-    const title = state.type.length === 1 ? ({ 'Loose Bead': 'Loose beads', Mala: 'Malas', Bracelet: 'Bracelets', Pendant: 'Pendants' }[state.type[0]] || 'The collection') : 'The collection';
-    $('#shopTitle').textContent = title;
-    $('#crumb').textContent = title === 'The collection' ? 'Shop' : title;
+      : `<div class="empty-state">${txt('h3', 'shop.emptyTitle')}${txt('p', 'shop.emptyText')}<button class="button button--dark" type="button" data-reset>Clear filters</button></div>`;
+    // One type selected: use that category's name (Website > Shop-by-category labels) as the heading.
+    const typeKey = state.type.length === 1 ? { 'Loose Bead': 'looseBead', Mala: 'mala', Bracelet: 'bracelet', Pendant: 'pendant' }[state.type[0]] : null;
+    const key = typeKey ? `categories.labels.${typeKey}` : 'pages.shop.title';
+    const title = Site.t(key) || T('shop.title');
+    for (const el of [$('#shopTitle'), $('#crumb')]) { el.dataset.site = key; el.textContent = title; }
+    if (!typeKey) { $('#crumb').removeAttribute('data-site'); $('#crumb').textContent = 'Shop'; }
     syncUrl();
   }
 

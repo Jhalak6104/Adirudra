@@ -180,16 +180,16 @@
   function renderHeader() {
     const mount = $('#site-header'); if (!mount) return;
     const page = document.body.dataset.page;
-    const link = (href, label, key) => `<a href="${href}"${page === key ? ' aria-current="page"' : ''}>${label}</a>`;
+    const link = (href, label, key, path) => `<a href="${href}"${page === key ? ' aria-current="page"' : ''} data-site="nav.${path}" data-site-hide-empty>${label}</a>`;
     mount.outerHTML = `<header class="site-header">
       <div class="site-header__inner">
         <a class="brand" href="index.html"><img src="assets/logo.svg" alt="" width="40" height="40" data-site-src="brand.logo"><span data-site="brand.name">ADIRUDRA</span></a>
         <nav class="primary-nav" id="primaryNav" aria-label="Main">
-          ${link('index.html', 'Home', 'home')}
-          ${link('shop.html', 'Shop all', 'shop')}
-          ${link('shop.html?type=Mala', 'Malas', 'mala')}
-          ${link('shop.html?type=Bracelet', 'Bracelets', 'bracelet')}
-          ${link('index.html#authenticity', 'Authenticity', 'auth')}
+          ${link('index.html', 'Home', 'home', 'home')}
+          ${link('shop.html', 'Shop all', 'shop', 'shop')}
+          ${link('shop.html?type=Mala', 'Malas', 'mala', 'malas')}
+          ${link('shop.html?type=Bracelet', 'Bracelets', 'bracelet', 'bracelets')}
+          ${link('index.html#authenticity', 'Authenticity', 'auth', 'authenticity')}
         </nav>
         <div class="header-actions">
           <button class="icon-btn" type="button" id="searchToggle" aria-label="Search" aria-expanded="false" aria-controls="searchBar">${ICONS.search}</button>
@@ -199,7 +199,7 @@
       </div>
       <div class="search-bar" id="searchBar" hidden>
         <form action="shop.html" role="search">
-          <input class="input" type="search" name="q" placeholder="Search by mukhi, origin, mala, bracelet…" aria-label="Search products">
+          <input class="input" type="search" name="q" placeholder="Search by mukhi, origin, mala, bracelet…" data-site-placeholder="nav.searchPlaceholder" aria-label="Search products">
           <button class="button button--dark" type="submit">Search</button>
         </form>
       </div>
@@ -225,20 +225,20 @@
           <a class="brand" href="index.html"><img src="assets/logo.svg" alt="" width="40" height="40" data-site-src="brand.logo"><span data-site="brand.name">ADIRUDRA</span></a>
           <p data-site="footer.about"></p>
         </div>
-        <div><h3>Shop</h3><ul>
-          <li><a href="shop.html?type=Loose%20Bead">Loose beads</a></li>
-          <li><a href="shop.html?type=Mala">Malas</a></li>
-          <li><a href="shop.html?type=Bracelet">Bracelets</a></li>
-          <li><a href="shop.html?type=Pendant">Pendants</a></li>
+        <div><h3 data-site="footer.shopTitle">Shop</h3><ul>
+          <li><a href="shop.html?type=Loose%20Bead" data-site="categories.labels.looseBead" data-site-hide-empty>Loose beads</a></li>
+          <li><a href="shop.html?type=Mala" data-site="categories.labels.mala" data-site-hide-empty>Malas</a></li>
+          <li><a href="shop.html?type=Bracelet" data-site="categories.labels.bracelet" data-site-hide-empty>Bracelets</a></li>
+          <li><a href="shop.html?type=Pendant" data-site="categories.labels.pendant" data-site-hide-empty>Pendants</a></li>
         </ul></div>
-        <div><h3>Help</h3><ul>
-          <li><a href="cart.html">Your cart</a></li>
-          <li><a href="index.html#authenticity">Authenticity</a></li>
-          <li><a href="index.html#faq">Shipping &amp; returns</a></li>
+        <div><h3 data-site="footer.helpTitle">Help</h3><ul>
+          <li><a href="cart.html" data-site="footer.cartLabel" data-site-hide-empty>Your cart</a></li>
+          <li><a href="index.html#authenticity" data-site="footer.authenticityLabel" data-site-hide-empty>Authenticity</a></li>
+          <li><a href="index.html#faq" data-site="footer.faqLabel" data-site-hide-empty>Shipping &amp; returns</a></li>
         </ul></div>
-        <div><h3>Contact</h3><ul>
+        <div><h3 data-site="footer.contactTitle">Contact</h3><ul>
           ${CONFIG.email ? `<li><a href="mailto:${esc(CONFIG.email)}">${esc(CONFIG.email)}</a></li>` : ''}
-          <li><a href="${whatsappLink('Namaste, I have a question about Adirudra products.')}" target="_blank" rel="noopener">WhatsApp us</a></li>
+          <li><a href="${whatsappLink('Namaste, I have a question about Adirudra products.')}" target="_blank" rel="noopener" data-site="footer.whatsappLabel" data-site-hide-empty>WhatsApp us</a></li>
         </ul></div>
       </div>
       <div class="shell site-footer__bottom"><span>© ${new Date().getFullYear()} <span data-site="footer.copyright"></span></span><span data-site="footer.note"></span></div>

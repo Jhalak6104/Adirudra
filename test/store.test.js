@@ -254,3 +254,25 @@ test('settings: admin edits fees, contact and coupons; pricing uses them at once
   assert.equal((await call('/api/admin/settings', { method: 'PUT', body: original, cookie })).status, 200);
   assert.equal(config.shop.shippingFee, original.shippingFee);
 });
+
+test('site: page text, menu labels and link targets are editable and validated', async () => {
+  const cookie = await adminCookie();
+  const site = structuredClone(DEFAULTS);
+  site.pages.cart.title = 'Your basket';
+  site.pages.checkout.codText = 'Pay at your door ({codFee}).';
+  site.nav.bracelets = '';
+  site.featured.link = 'shop.html?type=Mala';
+  const r = await call('/api/admin/site', { method: 'PUT', body: site, cookie });
+  assert.equal(r.status, 200);
+  assert.equal(r.body.site.pages.cart.title, 'Your basket');
+  assert.equal(r.body.site.nav.bracelets, '');
+  const page = await (await fetch(base + '/cart.html')).text();
+  assert.match(page, /"Your basket"/);
+  assert.match(page, /window\.SHOP=\{"freeShippingOver":\d+,"shippingFee":\d+,"codFee":\d+\}/);
+
+  const bad = structuredClone(site); bad.featured.link = 'javascript:alert(1)';
+  assert.equal((await call('/api/admin/site', { method: 'PUT', body: bad, cookie })).body.field, 'featured.link');
+  const long = structuredClone(site); long.pages.shop.title = 'x'.repeat(200);
+  assert.equal((await call('/api/admin/site', { method: 'PUT', body: long, cookie })).body.field, 'pages.shop.title');
+  await call('/api/admin/site/reset', { method: 'POST', cookie });
+});
